@@ -1,5 +1,9 @@
 import styled from "styled-components"
 
+interface StrongProps {
+  negative: boolean
+}
+
 export const Container = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -18,17 +22,19 @@ export const Container = styled.div`
       justify-content: space-between;
     }
 
-    strong {
-      display: block;
-      margin-top: 1rem;
-      font-size: 2rem;
-      font-weight: 500;
-      line-height: 3rem;
-    }
-
     &.highlight-backgroud {
       background: var(--green);
       color: #fff;
     }
   }
+`
+
+export const SummaryText = styled.strong<StrongProps>`
+  display: block;
+  margin-top: 1rem;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 3rem;
+
+  color: ${(props) => (props.negative ? "red" : "black")};
 `
