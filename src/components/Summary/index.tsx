@@ -1,40 +1,26 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import incomeIgm from "../../assets/income.svg"
 import outcomeIgm from "../../assets/outcome.svg"
 import totalIgm from "../../assets/total.svg"
-import { api } from "../../services/api"
+import { TransactionsContext } from "../../TransactionsContext"
 
 import { Container } from "./styles"
 
-type Transactions = {
-  id: number
-  title: string
-  amount: number
-  type: string
-  category: string
-  createdAt: Date
-}
-
 export const Summary = () => {
-  const [table, setTable] = useState<Transactions[]>([])
   const [income, setIncome] = useState<number>(0)
   const [outcome, setOutcome] = useState<number>(0)
   const [total, setTotal] = useState<number>(0)
 
-  useEffect(() => {
-    api
-      .get("http://localhost:3000/api/transactions")
-      .then((response) => setTable(response?.data?.transactions))
-  }, [])
+  const transactions = useContext(TransactionsContext)
 
   useEffect(() => {
-    const incomes = table
+    const incomes = transactions
       ?.filter((t) => t.type === "deposit")
       ?.reduce((acc, val) => {
         return acc + val.amount
       }, 0)
 
-    const outcomes = table
+    const outcomes = transactions
       ?.filter((t) => t.type === "withdraw")
       ?.reduce((acc, val) => {
         return acc + val.amount
@@ -43,7 +29,7 @@ export const Summary = () => {
     setIncome(incomes)
     setOutcome(outcomes)
     setTotal(incomes - outcomes)
-  }, [table])
+  }, [transactions])
 
   return (
     <Container>
@@ -52,7 +38,12 @@ export const Summary = () => {
           <p>Entradas</p>
           <img src={incomeIgm} alt="Entradas" />
         </header>
-        <strong>{income}</strong>
+        <strong>
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(income)}
+        </strong>
       </div>
 
       <div>
@@ -60,7 +51,13 @@ export const Summary = () => {
           <p>Saídas</p>
           <img src={outcomeIgm} alt="Saidas" />
         </header>
-        <strong>-{outcome}</strong>
+        <strong>
+          -{" "}
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(outcome)}
+        </strong>
       </div>
 
       <div className="highlight-backgroud">
@@ -68,7 +65,13 @@ export const Summary = () => {
           <p>Saldo</p>
           <img src={totalIgm} alt="Total" />
         </header>
-        <strong>{total}</strong>
+        <strong>
+          {" "}
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(total)}
+        </strong>
       </div>
     </Container>
   )
